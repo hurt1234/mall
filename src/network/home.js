@@ -6,3 +6,13 @@ export function getHomeMultidata(config) {
   })
 
 }
+//导出首页的商品的详细信息
+export function getHomeGoods(type,page) {
+  return request({
+    url:'/home/data',
+    params:{
+      type,
+      page
+    }
+  })
+}

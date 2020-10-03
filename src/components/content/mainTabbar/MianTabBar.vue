@@ -50,6 +50,7 @@ export default {
 <style lang='css' scoped>
   #main-tab-bar {
     font-size: 14px;
+   
   }
 
 </style>

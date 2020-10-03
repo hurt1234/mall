@@ -1,6 +1,6 @@
 <template>
   <div id="home-recommed">
-    <a :href="item.link" v-for="item in  recommends" >
+    <a :href="item.link" v-for="item in recommends" :key="item.link">
       <img :src="item.image" alt="">
       <div>{{item.title}}</div>
     </a>
@@ -23,7 +23,7 @@
 <style lang="css" scoped>
   #home-recommed {
     display: flex;
-    padding: 10px 0px 20px;
+    padding: 10px 0px 20px 10px;
     border-bottom: 6px solid #eee;
     box-sizing: border-box;
 
