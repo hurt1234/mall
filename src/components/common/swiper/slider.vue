@@ -19,7 +19,7 @@
       <slot></slot>
     </div>
     <div class="ic-slider__indicators" v-if="showIndicators && count > 1">
-      <i v-for="index in count" :class="{ 'ic-slider__indicator--active': index - 1 === activeIndicator }" />
+      <i v-for="index in count" :key="index" :class="{ 'ic-slider__indicator--active': index - 1 === activeIndicator }" />
     </div>
 </div>
 </template>

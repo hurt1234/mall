@@ -1,9 +1,9 @@
 <template>
   <div>
     <ic-slider :autoplay="2000">
-      <ic-slider-item v-for="item in banners">
+      <ic-slider-item v-for="item in banners" :key="item.link">
         <a :href="item.link">
-          <img :src="item.image" alt="">
+          <img :src="item.image" @load="imageLoad" alt="">
         </a>
 
       </ic-slider-item>
@@ -23,9 +23,25 @@
       }
 
     },
+    data() {
+      return {
+        isLoad:true
+
+      }
+
+    },
+    
     components:{
       IcSlider,
       IcSliderItem
+    },
+    methods:{
+      imageLoad() {
+        if(this.isLoad) {
+          this.$emit('swiperImageLoad');
+          this.isLoad=false;
+        }
+      }
     }
   }
 </script>

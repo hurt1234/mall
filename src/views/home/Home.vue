@@ -3,15 +3,27 @@
       <nav-bar class="home-nav">
         <div slot="center">购物街</div>
       </nav-bar>
-    <scroll class="content">
-    <home-swiper :banners="banners"/>
+      <tab-control v-show="!isTabControl" class="home-tab" :titles="['流行','新款','精选']" @activeClick="activeClick" ref="tabControl2" />
+     
+    <scroll class="wrapper"
+            ref="scroll"
+            @pullingUp="loadUp"
+            @monitorScroll="monitorScroll"
+            :probeType="3">
+      
+     <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
      <home-recommed :recommends="recommends"/>
      <home-feature/>
      <!-- tab control -->
-     <tab-control class="home-tab" :titles="['流行','新款','精选']" @activeClick="activeClick" />
+     <tab-control v-show="isTabControl" class="home-tab" :titles="['流行','新款','精选']" @activeClick="activeClick" ref="tabControl1" />
+    
      <!-- 商品信息 -->
      <goods-list :goods="goods[currentType].list"/>
+      
+   
     </scroll>
+    <!-- 返回顶部 -->
+    <back-top @click.native="backTop" v-show="isShow" />
 
      
      
@@ -27,6 +39,9 @@ import NavBar from "components/common/navbar/NavBar";
 import TabControl from "components/content/tabControl/TabControl";
 import GoodsList from 'components/content/goodsShow/GoodsList';
 import Scroll from 'components/common/scroll/Scroll';
+import BackTop from 'components/content/backTop/BackTop'
+
+import { debounce} from 'common/utils'
 
 
 
@@ -41,7 +56,8 @@ export default {
     HomeFeature,
     TabControl,
     GoodsList,
-    Scroll
+    Scroll,
+    BackTop
 
    },
 
@@ -54,7 +70,12 @@ export default {
           'new':{page:0,list:[]},
           'sell':{page:0,list:[]},
         },
-        currentType:'pop'
+        currentType:'pop',
+        //isshow显示上拉的状态
+        isShow:false,
+        isTabControl:true,
+        tabControlOffsetTop:0,
+        saveY:0
 
       };
    },
@@ -65,6 +86,34 @@ export default {
     this.getHomeGoods('pop');
     this.getHomeGoods('new');
     this.getHomeGoods('sell');
+    //监听图片加载，并刷新better-scroll的内容高度
+   
+   
+  },
+  activated() {
+    //console.log(11);
+    this.$refs.scroll.backTo(0,this.saveY,0);
+    this.$refs.scroll.refresh()
+    
+
+
+  },
+  deactivated() {
+   this.saveY=this.$refs.scroll.getScrollY()
+   //console.log(this.saveY);
+   //console.log('00');
+   
+
+  },
+  mounted() {
+    const refresh = debounce(this.$refs.scroll.refresh,300)
+     this.$bus.$on('itemImageLoad',()=>{
+      
+      refresh();
+      
+    })
+    
+   
    
   },
 
@@ -81,10 +130,31 @@ export default {
           case 2:
             this.currentType='sell';
             break;
-
        }
+       this.$refs.tabControl1.currentIndex=index;
+       this.$refs.tabControl2.currentIndex=index;
        
 
+     },
+     backTop() {
+       this.$refs.scroll.backTo(0,0,300)
+     },
+     //上拉加载更多方法
+     loadUp() {
+       this.getHomeGoods(this.currentType);
+
+     },
+     //吸顶获取tabControl1的位置
+      swiperImageLoad() {
+      this.tabControlOffsetTop = this.$refs.tabControl1.$el.offsetTop;
+      //console.log(this.tabControlOffsetTop);
+      
+    },
+     //监听滚动的方法
+     monitorScroll(position) {
+       this.isShow = -position.y>1000;
+       this.isTabControl=-position.y>this.tabControlOffsetTop ? false : true ;
+       
      },
 
 
@@ -103,6 +173,9 @@ export default {
        getHomeGoods(type,page).then(res=>{
          this.goods[type].list.push(...res.data.data.list);
          this.goods[type].page+=1;
+         //上拉加载更多
+         this.$refs.scroll.scroll.finishPullUp();
+         this.$refs.scroll.scroll.refresh();
          
 
        },err=>{
@@ -119,7 +192,7 @@ export default {
 <style lang='css' scoped>
   #home {
     padding-top: 44px;
-   /*  position: relative; */ 
+    position: relative; 
     height: 100vh;
     
     
@@ -138,13 +211,13 @@ export default {
     position: sticky;
     top:44px;
   }
-  .content {
-   /* position: absolute;
+  .wrapper {
+   position: absolute;
    top:44px;
    bottom: 49px;
    left: 0;
-   right: 0; */
-   height: 475px;
+   right: 0;
+ 
    overflow: hidden;
    
    
@@ -152,6 +225,7 @@ export default {
     
 
   }
+ 
 
 
 </style>
