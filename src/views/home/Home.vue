@@ -91,7 +91,7 @@ export default {
    
   },
   activated() {
-    //console.log(11);
+   // console.log(11);
     this.$refs.scroll.backTo(0,this.saveY,0);
     this.$refs.scroll.refresh()
     
