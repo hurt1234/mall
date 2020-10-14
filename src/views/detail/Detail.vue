@@ -1,7 +1,7 @@
 <template>
    <div id="detail">
       <detail-nav-bar class="detail-nav"/>
-      <scroll class="content" ref="scroll">
+      <scroll class="content" ref="scroll" :probeType="3" @monitorScroll='contentScroll'>
          <detail-swiper :topImages="topImages"/>
          <detail-goods :goods="goods"/>
          <detail-shop :shop="shop"/>
@@ -18,7 +18,9 @@
         
 
       </scroll>
+      <detail-bottom-bar @addToCart="addToCart"  />
       <back-top @click.native="backTop" v-show="isShowBackTop" />
+      
       
    
    </div>
@@ -31,8 +33,10 @@ import DetailGoods from './childComponents/DetailGoods';
 import DetailShop from './childComponents/DetailShop';
 import DetailParam from './childComponents/DetailParam'; 
 import DetailComment from './childComponents/DetailComment'; 
+import DetailBottomBar from './childComponents/DetailBottomBar'; 
 
 import Scroll from 'components/common/scroll/Scroll';
+
 import GoodsList from 'components/content/goodsShow/GoodsList'
 
 import { getDetailData ,Goods, GoodsParam ,getRecommend  } from 'network/detail'
@@ -40,6 +44,7 @@ import { getDetailData ,Goods, GoodsParam ,getRecommend  } from 'network/detail'
 import { backTopMixin }  from 'common/mixin'
 export default {
    name:"Detail",
+   mixins:[backTopMixin],
    data () {
       return {
          iid:null,
@@ -49,6 +54,7 @@ export default {
          paramInfo:{},
          commentInfo:{},
          recommendInfo:[],
+        
 
       };
    },
@@ -92,11 +98,27 @@ export default {
       DetailShop,
       DetailParam,
       DetailComment,
-      GoodsList
+      GoodsList,
+      DetailBottomBar,
+      
 
    },
 
-   methods: {}
+   methods: {
+      addToCart() {
+     this.$toast.show('加入成功', 1000)
+         
+
+         
+         
+
+      },
+      contentScroll(position) {
+        // console.log(position);
+        this.isShowBackTop = -position.y>1000;
+         
+      }
+   }
 }
 </script>
 <style lang='css' scoped>

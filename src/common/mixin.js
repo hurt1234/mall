@@ -1,4 +1,4 @@
-import backTop from 'components/content/backTop/BackTop'
+import BackTop from 'components/content/backTop/BackTop'
 export const backTopMixin = {
   data() {
     return {
@@ -6,11 +6,14 @@ export const backTopMixin = {
     }
   },
   components:{
-    backTop
+    BackTop
   },
   methods:{
     backTop() {
-      this.refs.scroll.backTo(0,0,0);
+      //console.log(111);
+      
+      this.$refs.scroll.backTo(0,0,200);
+      
     }
   }
 
